@@ -1,8 +1,9 @@
 package examples;
 
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -11,16 +12,28 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FibonacciTest {
-    private Fibonacci fibonacci = new Fibonacci();
+    private Fibonacci fibonacci;
 
+    @BeforeEach
+    void setupEachFibonacci() {
+        fibonacci = new Fibonacci();
+    }
+
+    @DisplayName("Basic test of recursive fibonacci implementation")
     @Test
     void testComputeRecursive() throws Exception {
         assertEquals(55, fibonacci.compute(10, "RECURSIVE"));
     }
 
     @Test
-    void testComputeRecursiveBadInputException() {
+    void testComputeRecursiveBadInputException0() {
         assertThrows(Exception.class, () -> fibonacci.compute(0, "RECURSIVE"));
+    }
+
+    @Test
+    @Disabled("It is not working, dunno why")
+    void testComputeRecursiveBadInputException100() {
+        assertThrows(Exception.class, () -> fibonacci.compute(100, "RECURSIVE"));
     }
 
     @Test
@@ -48,6 +61,8 @@ class FibonacciTest {
         assertEquals(5, fibonacci.compute(5, "ITERATIVE"));
     }
 
+
+
     @ParameterizedTest
     @MethodSource("dataGenerator")
     void testParameterizedComputeIterative(Integer n, Long result) throws Exception {
@@ -59,6 +74,13 @@ class FibonacciTest {
     void testParameterizedComputeIterativeFail(Integer n) {
         assertDoesNotThrow(() -> fibonacci.compute(n, "ITERATIVE"));
     }
+
+    @ParameterizedTest
+    @CsvSource({"1,1", "2,1", "3,2"})
+    void testParameterizedComputeIterativeCsv(Integer input, Long expected) throws Exception {
+        assertEquals(expected, fibonacci.compute(input, "ITERATIVE"));
+    }
+
 
     private static Stream<Arguments> dataGenerator() {
         return Stream.of(
